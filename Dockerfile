@@ -24,12 +24,13 @@ RUN apt-get update && \
 # Create steam user and group
 RUN groupadd --gid $GID steam && \
     useradd --create-home -c 'Steam User' -l --uid $UID --gid $GID --home-dir $INSTALL_DIR steam && \
-    chown -R steam:steam ${INSTALL_DIR}
+    chown -R steam:steam ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} && \
+    chmod 777 ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
 
 # Copy and prepare start script
 COPY start.sh $INSTALL_DIR/start.sh
 RUN chmod +x ${INSTALL_DIR}/start.sh && \
-    chown steam:steam ${INSTALL_DIR}/start.sh
+    chown -R steam:steam ${INSTALL_DIR}/start.sh
 
 # Switch to steam user
 USER steam

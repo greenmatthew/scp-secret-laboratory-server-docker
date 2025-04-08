@@ -19,11 +19,10 @@ build:
 
 # Run the container
 .PHONY: run
-run:
+run: build
 	@echo "Running container: $(CONTAINER_NAME)"
 	docker run -d --name $(CONTAINER_NAME) \
 		-p $(PORT):$(PORT)/udp \
-		-v $(PWD)/config:/home/steam/.config/SCP\ Secret\ Laboratory/config/$(PORT) \
 		--restart unless-stopped \
 		$(IMAGE_NAME):latest
 
