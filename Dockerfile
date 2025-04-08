@@ -16,9 +16,9 @@ RUN mkdir -p ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
 RUN apt-get update && \
     apt-get install -y libicu-dev
 
-# Create a new group and user
-RUN addgroup --gid $GID steam && \
-    adduser --disabled-password --gecos '' --uid $UID --gid $GID steam
+# Create a new group and user using groupadd/useradd instead of addgroup/adduser
+RUN groupadd --gid $GID steam && \
+    useradd --disabled-password --gecos '' --uid $UID --gid $GID steam
 
 COPY start.sh $INSTALL_DIR/start.sh
 # COPY config_gameplay.txt $CONFIGS/config_gameplay.txt
@@ -27,6 +27,7 @@ COPY start.sh $INSTALL_DIR/start.sh
 # COPY localadmin_internal_data.json $CONFIGS/../localadmin_internal_data.json
 
 # Change ownership of directories and set the start script as executable
-RUN chown $UID:$GID -R ${STEAM_DIR} ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
+RUN chown $UID:$GID -R ${STEAM_DIR} ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} && \
+    chmod +x ${INSTALL_DIR}/start.sh
 
 ENTRYPOINT /bin/sh ${INSTALL_DIR}/start.sh
