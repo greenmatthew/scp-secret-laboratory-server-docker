@@ -23,7 +23,7 @@ run: build
 	@echo "Running container: $(CONTAINER_NAME)"
 	docker run -d --name $(CONTAINER_NAME) \
 		-p $(PORT):$(PORT)/udp \
-		-v $(PWD)/config:/home/steam/config \
+		-v $(PWD)/config:/home/steam/.config \
 		-e UID=1001 \
 		-e GID=1001 \
 		--restart unless-stopped \

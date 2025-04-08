@@ -1,1 +1,110 @@
-# scp-secret-laboratory-docker
+# SCP: Secret Laboratory Docker Server
+
+A Docker container for easily running an SCP: Secret Laboratory dedicated server.
+
+## Quick Start
+
+<details open>
+<summary><b>Using Docker Compose (Recommended)</b></summary>
+
+1. Create a `docker-compose.yml` file:
+
+```yaml
+services:
+  scp-sl-server:
+    image: greenmatthew/scp-secret-laboratory-server:latest
+    container_name: scp-sl-server
+    ports:
+      - "7777:7777/udp"
+    volumes:
+      - ./config:/home/steam/.config
+    environment:
+      - UID=1000
+      - GID=1000
+    restart: unless-stopped
+```
+
+2. Start the server:
+
+```bash
+docker-compose up -d
+```
+
+3. Check logs:
+
+```bash
+docker-compose logs -f
+```
+</details>
+
+<details>
+<summary><b>Using Docker CLI</b></summary>
+
+1. Pull the image:
+
+```bash
+docker pull greenmatthew/scp-secret-laboratory-server:latest
+```
+
+2. Run the server:
+
+```bash
+docker run -d \
+  --name scp-sl-server \
+  -p 7777:7777/udp \
+  -v ./config:/home/steam/.config \
+  -e UID=1000 \
+  -e GID=1000 \
+  --restart unless-stopped \
+  greenmatthew/scp-secret-laboratory-server:latest
+```
+
+3. Check logs:
+
+```bash
+docker logs -f scp-sl-server
+```
+</details>
+
+## Configuration
+
+Mounting the .config directory allows you to configure any server setting and have it persist between container restarts.
+
+## Environment Variables
+
+- `UID`: User ID to run the server as (default: 1000)
+- `GID`: Group ID to run the server as (default: 1000)
+
+## Port Configuration
+
+The default server port is 7777/UDP. To use a different external port, adjust the port mapping:
+
+<details>
+<summary><b>In Docker Compose</b></summary>
+
+```yaml
+ports:
+  - "8777:7777/udp"  # Maps external port 8777 to internal port 7777
+```
+</details>
+
+<details>
+<summary><b>In Docker CLI</b></summary>
+
+```bash
+-p 8777:7777/udp  # Maps external port 8777 to internal port 7777
+```
+</details>
+
+## Development
+
+A Makefile is included for development:
+
+```bash
+# For available commands
+make help
+```
+
+## License
+
+Released under the MIT License. See [LICENSE](LICENSE) file for details.

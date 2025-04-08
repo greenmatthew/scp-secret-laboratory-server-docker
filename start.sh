@@ -24,6 +24,6 @@ if [ ! -f "$INTERNAL_DATA_FILE" ]; then
 fi
 
 # Run server
-cd $SERVER_DIR && HOME=$INSTALL_DIR ./LocalAdmin $PORT --config $(CONFIG_DIR)
+cd $SERVER_DIR && HOME=$INSTALL_DIR ./LocalAdmin $PORT
 
 sleep infinity
