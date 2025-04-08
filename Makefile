@@ -3,8 +3,7 @@ IMAGE_NAME := greenmatthew/scp-secret-laboratory-server
 VERSION := 1.0.0
 CONTAINER_NAME := scp-sl-server
 PORT := 7777
-
-# Set this to your Docker Hub username before pushing
+SHELL := /bin/sh
 DOCKER_USERNAME ?= greenmatthew
 
 # Default goal
@@ -28,6 +27,12 @@ run:
 		--restart unless-stopped \
 		$(IMAGE_NAME):latest
 
+# Get a shell inside the container
+.PHONY: shell
+shell:
+	@echo "Executing shell in container: $(CONTAINER_NAME)"
+	docker exec -it $(CONTAINER_NAME) $(SHELL)
+
 # Stop the container
 .PHONY: stop
 stop:
@@ -45,14 +50,6 @@ push:
 	@echo "Pushing to Docker Hub: $(IMAGE_NAME):$(VERSION) and $(IMAGE_NAME):latest"
 	docker push $(IMAGE_NAME):$(VERSION)
 	docker push $(IMAGE_NAME):latest
-
-# Tag and push with current date
-.PHONY: tag-date
-tag-date:
-	$(eval DATE := $(shell date +%Y%m%d))
-	@echo "Tagging with date: $(IMAGE_NAME):$(DATE)"
-	docker tag $(IMAGE_NAME):latest $(IMAGE_NAME):$(DATE)
-	docker push $(IMAGE_NAME):$(DATE)
 
 # Login to Docker Hub
 .PHONY: login
@@ -74,10 +71,10 @@ help:
 	@echo "  all (default) - Build the Docker image"
 	@echo "  build         - Build the Docker image"
 	@echo "  run           - Run the container"
+	@echo "  shell         - Get a shell inside the running container"
 	@echo "  stop          - Stop and remove the container"
 	@echo "  restart       - Restart the container"
 	@echo "  push          - Push the image to Docker Hub"
-	@echo "  tag-date      - Tag and push image with current date"
 	@echo "  login         - Login to Docker Hub"
 	@echo "  clean         - Stop container and remove images"
 	@echo "  logs          - View container logs"
@@ -88,6 +85,7 @@ help:
 	@echo "  VERSION       = $(VERSION)"
 	@echo "  CONTAINER_NAME = $(CONTAINER_NAME)"
 	@echo "  PORT          = $(PORT)"
+	@echo "  SHELL         = $(SHELL)"
 	@echo "  DOCKER_USERNAME = $(DOCKER_USERNAME)"
 
 # View container logs
