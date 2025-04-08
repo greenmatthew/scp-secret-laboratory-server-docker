@@ -1,46 +1,29 @@
 FROM steamcmd/steamcmd:debian
 
 ENV PORT=7777
+ENV INSTALL_DIR=/home/steam
+ENV SERVER_DIR=${INSTALL_DIR}/server
+ENV CONFIG_DIR=${INSTALL_DIR}/.config
+ENV CONFIG_TEMPLATES_DIR=${INSTALL_DIR}/config-templates
+# Default UID/GID that can be overridden at runtime
 ENV UID=1000
 ENV GID=1000
-# ENV HOME_DIR=/home/steam
-# ENV SERVER=$HOME_DIR/server
-# ENV CONFIGS=$HOME_DIR/.config/SCP\ Secret\ Laboratory/config/$PORT
-ENV STEAM_DIR=/usr/lib/games/steam
-ENV INSTALL_DIR=/home/steam
-ENV SERVER_DIR=$INSTALL_DIR/server
-ENV CONFIG_DIR=$INSTALL_DIR/.config
-ENV CONFIG_TEMPLATES_DIR=$INSTALL_DIR/.config-templates
 
-RUN mkdir -p ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR}
-
+# Install dependencies
 RUN apt-get update && \
-    apt-get install -y libicu-dev
+    apt-get install -y libicu-dev gosu && \
+    rm -rf /var/lib/apt/lists/*
 
-# COPY config_gameplay.txt $CONFIGS/config_gameplay.txt
-# COPY config_remoteadmin.txt $CONFIGS/config_remoteadmin.txt
-# COPY config_localadmin_global.txt $CONFIGS/../config_localadmin_global.txt
-# COPY localadmin_internal_data.json $CONFIGS/../localadmin_internal_data.json
+# Create directories (but don't create the user yet)
+RUN mkdir -p ${CONFIG_TEMPLATES_DIR}
+COPY config-templates/ ${CONFIG_TEMPLATES_DIR}/
 
-# Create steam user and group
-RUN groupadd --gid $GID steam && \
-    useradd --create-home -c 'Steam User' -l --uid $UID --gid $GID --home-dir $INSTALL_DIR steam && \
-    chown -R steam:steam ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR} && \
-    chmod 777 ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR}
+# Copy and prepare scripts
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Copy and prepare start script
-COPY start.sh $INSTALL_DIR/start.sh
-RUN chmod +x ${INSTALL_DIR}/start.sh && \
-    chown -R steam:steam ${INSTALL_DIR}/start.sh
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Copy configuration template files
-COPY config-templates/ ${CONFIG_TEMPLATES_DIR}
-
-# Switch to steam user
-USER steam
-WORKDIR $INSTALL_DIR
-
-# Set HOME environment variable to INSTALL_DIR to force steamcmd to use it
-ENV HOME=$INSTALL_DIR
-
-ENTRYPOINT ["/bin/sh", "start.sh"]
+# User will be created at runtime based on ENV values
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
