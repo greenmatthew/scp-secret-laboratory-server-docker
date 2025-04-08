@@ -10,8 +10,9 @@ ENV STEAM_DIR=/usr/lib/games/steam
 ENV INSTALL_DIR=/home/steam
 ENV SERVER_DIR=$INSTALL_DIR/server
 ENV CONFIG_DIR=$INSTALL_DIR/.config
+ENV CONFIG_TEMPLATES_DIR=$INSTALL_DIR/.config-templates
 
-RUN mkdir -p ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
+RUN mkdir -p ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR}
 
 RUN apt-get update && \
     apt-get install -y libicu-dev
@@ -24,13 +25,16 @@ RUN apt-get update && \
 # Create steam user and group
 RUN groupadd --gid $GID steam && \
     useradd --create-home -c 'Steam User' -l --uid $UID --gid $GID --home-dir $INSTALL_DIR steam && \
-    chown -R steam:steam ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} && \
-    chmod 777 ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
+    chown -R steam:steam ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR} && \
+    chmod 777 ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} ${CONFIG_TEMPLATES_DIR}
 
 # Copy and prepare start script
 COPY start.sh $INSTALL_DIR/start.sh
 RUN chmod +x ${INSTALL_DIR}/start.sh && \
     chown -R steam:steam ${INSTALL_DIR}/start.sh
+
+# Copy configuration template files
+COPY config-templates/ ${CONFIG_TEMPLATES_DIR}
 
 # Switch to steam user
 USER steam
