@@ -8,6 +8,8 @@ ENV CONFIG_TEMPLATES_DIR=${INSTALL_DIR}/config-templates
 # Default UID/GID that can be overridden at runtime
 ENV UID=1000
 ENV GID=1000
+# Default timezone is UTC
+ENV TZ=Etc/UTC
 
 # Install dependencies
 RUN apt-get update && \

@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+# Set timezone
+if [ ! -z "$TZ" ]; then
+  echo "Setting timezone to $TZ"
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+  echo $TZ > /etc/timezone
+fi
+
 echo "Setting up container with UID:${UID} and GID:${GID}"
 
 # Check if group with GID exists

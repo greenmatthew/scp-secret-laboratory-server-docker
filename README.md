@@ -21,6 +21,8 @@ services:
     environment:
       - UID=1000
       - GID=1000
+      # To set a timezone, uncomment the next line and change Etc/UTC to a TZ identifier from this [list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+      # - TZ=Etc/UTC
     restart: unless-stopped
 ```
 
@@ -55,6 +57,8 @@ docker run -d \
   -v ./config:/home/steam/.config \
   -e UID=1000 \
   -e GID=1000 \
+  # To set a timezone, uncomment the next line and change Etc/UTC to a TZ identifier from this [list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
+  # -e TZ=Etc/UTC \
   --restart unless-stopped \
   greenmatthew/scp-secret-laboratory-server:latest
 ```
@@ -74,6 +78,7 @@ Mounting the .config directory allows you to configure any server setting and ha
 
 - `UID`: User ID to run the server as (default: 1000)
 - `GID`: Group ID to run the server as (default: 1000)
+- `TZ`: [Timezone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) for the container (default: Etc/UTC). Examples: `America/Chicago`, `Europe/London`, `Asia/Tokyo`
 
 ## Port Configuration
 

@@ -1,6 +1,6 @@
 # Configuration
 IMAGE_NAME := greenmatthew/scp-secret-laboratory-server
-VERSION := 1.0.0
+VERSION := 1.0.1
 CONTAINER_NAME := scp-sl-server
 PORT := 7777
 SHELL := /bin/sh
@@ -24,6 +24,7 @@ run: build
 	docker run -d --name $(CONTAINER_NAME) \
 		-p $(PORT):$(PORT)/udp \
 		-v $(PWD)/config:/home/steam/.config \
+		-e TZ=America/Chicago \
 		-e UID=1001 \
 		-e GID=1001 \
 		--restart unless-stopped \
