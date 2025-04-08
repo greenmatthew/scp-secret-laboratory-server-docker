@@ -1,4 +1,4 @@
-FROM steamcmd/steamcmd:latest
+FROM steamcmd/steamcmd:debian
 
 ENV PORT=7777
 ENV UID=1000
@@ -16,18 +16,26 @@ RUN mkdir -p ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR}
 RUN apt-get update && \
     apt-get install -y libicu-dev
 
-# Create a new group and user using groupadd/useradd instead of addgroup/adduser
-RUN groupadd --gid $GID steam && \
-    useradd --disabled-password --gecos '' --uid $UID --gid $GID steam
-
-COPY start.sh $INSTALL_DIR/start.sh
 # COPY config_gameplay.txt $CONFIGS/config_gameplay.txt
 # COPY config_remoteadmin.txt $CONFIGS/config_remoteadmin.txt
 # COPY config_localadmin_global.txt $CONFIGS/../config_localadmin_global.txt
 # COPY localadmin_internal_data.json $CONFIGS/../localadmin_internal_data.json
 
-# Change ownership of directories and set the start script as executable
-RUN chown $UID:$GID -R ${STEAM_DIR} ${INSTALL_DIR} ${SERVER_DIR} ${CONFIG_DIR} && \
-    chmod +x ${INSTALL_DIR}/start.sh
+# Create steam user and group
+RUN groupadd --gid $GID steam && \
+    useradd --create-home -c 'Steam User' -l --uid $UID --gid $GID --home-dir $INSTALL_DIR steam && \
+    chown -R steam:steam ${INSTALL_DIR}
 
-ENTRYPOINT /bin/sh ${INSTALL_DIR}/start.sh
+# Copy and prepare start script
+COPY start.sh $INSTALL_DIR/start.sh
+RUN chmod +x ${INSTALL_DIR}/start.sh && \
+    chown steam:steam ${INSTALL_DIR}/start.sh
+
+# Switch to steam user
+USER steam
+WORKDIR $INSTALL_DIR
+
+# Set HOME environment variable to INSTALL_DIR to force steamcmd to use it
+ENV HOME=$INSTALL_DIR
+
+ENTRYPOINT ["/bin/sh", "start.sh"]
